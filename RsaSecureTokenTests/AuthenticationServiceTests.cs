@@ -15,9 +15,9 @@ namespace RsaSecureToken.Tests
         [TestMethod()]
         public void IsValidTest()
         {
-            var profileDao = Substitute.For<IProfileDao>();
+            var profileDao = Substitute.For<IProfile>();
             profileDao.GetPassword(Arg.Any<string>()).Returns("91");
-            var rsaToken = Substitute.For<IRsaTokenDao>();
+            var rsaToken = Substitute.For<IToken>();
             rsaToken.GetRandom(Arg.Any<string>()).Returns("000000");
             
             var target = new AuthenticationService(profileDao, rsaToken);

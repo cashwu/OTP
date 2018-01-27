@@ -13,14 +13,27 @@ namespace RsaSecureToken
 
     public class AuthenticationService
     {
+        private IProfile profileDao;
+        private IToken rsaToken;
+
+        public AuthenticationService()
+        {
+            profileDao = new ProfileDao();
+            rsaToken = new RsaTokenDao();
+        }
+
+        public AuthenticationService(IProfile profileDao, IToken rsaToken)
+        {
+            this.profileDao = profileDao;
+            this.rsaToken = rsaToken;
+        }
+
         public bool IsValid(string account, string password)
         {
             // 根據 account 取得自訂密碼
-            var profileDao = new ProfileDao();
             var passwordFromDao = profileDao.GetPassword(account);
 
             // 根據 account 取得 RSA token 目前的亂數
-            var rsaToken = new RsaTokenDao();
             var randomCode = rsaToken.GetRandom(account);
 
             // 驗證傳入的 password 是否等於自訂密碼 + RSA token亂數
@@ -30,7 +43,17 @@ namespace RsaSecureToken
         }       
     }
 
-    public class ProfileDao
+    public interface IToken
+    {
+        string GetRandom(string account);
+    }
+
+    public interface IProfile
+    {
+        string GetPassword(string account);
+    }
+
+    public class ProfileDao : IProfile
     {
         public string GetPassword(string account)
         {
@@ -56,7 +79,7 @@ namespace RsaSecureToken
         }
     }
 
-    public class RsaTokenDao
+    public class RsaTokenDao : IToken
     {
         public string GetRandom(string account)
         {

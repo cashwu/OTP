@@ -5,28 +5,28 @@ namespace RsaSecureToken
 {
     public class AuthenticationService
     {
-        private IProfileDao profileDao;
-        private IRsaTokenDao rsaTokenDao;
+        private IProfile profile;
+        private IToken token;
 
         public AuthenticationService()
         {
-            profileDao = new ProfileDao();
-            rsaTokenDao = new RsaTokenDao();
+            profile = new Profile();
+            token = new Token();
         }
 
-        public AuthenticationService(IProfileDao profileDao, IRsaTokenDao rsaTokenDao)
+        public AuthenticationService(IProfile profile, IToken token)
         {
-            this.profileDao = profileDao;
-            this.rsaTokenDao = rsaTokenDao;
+            this.profile = profile;
+            this.token = token;
         }
 
         public bool IsValid(string account, string passCode)
         {
             // 根據 account 取得自訂密碼
-            var passwordFromDao = profileDao.GetPassword(account);
+            var passwordFromDao = profile.GetPassword(account);
 
             // 根據 account 取得 RSA token 目前的亂數
-            var randomCode = rsaTokenDao.GetRandom(account);
+            var randomCode = token.GetRandom(account);
 
             // 驗證傳入的 passCode 是否等於自訂密碼 + RSA token亂數
             var validPassword = passwordFromDao + randomCode;
@@ -43,17 +43,17 @@ namespace RsaSecureToken
         }
     }
 
-    public interface IRsaTokenDao
+    public interface IToken
     {
         string GetRandom(string account);
     }
 
-    public interface IProfileDao
+    public interface IProfile
     {
         string GetPassword(string account);
     }
 
-    public class ProfileDao : IProfileDao
+    public class Profile : IProfile
     {
         public string GetPassword(string account)
         {
@@ -78,7 +78,7 @@ namespace RsaSecureToken
         }
     }
 
-    public class RsaTokenDao : IRsaTokenDao
+    public class Token : IToken
     {
         public string GetRandom(string account)
         {
